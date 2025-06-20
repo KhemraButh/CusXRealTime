@@ -150,7 +150,6 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
         with col1:
             name = st.text_input("Customer Name*")
             phone = st.text_input("Phone Number*")
-            cust_type = st.selectbox("Customer Type*", ["Prospect", "Existing", "VIP", "Repeat"])
             biz_type = st.selectbox('Biz Type*', ["General Retail","Electronics & Appliances","Fashion & Clothing", "Restaurant/Café",
             "Street Food Stall", "Beauty Salon", "Repair Services", "Tourism/Hospitality", "Agriculture/Farming"])
             
