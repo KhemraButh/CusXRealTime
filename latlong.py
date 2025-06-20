@@ -75,7 +75,7 @@ def save_to_db(data):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data['name'], data['phone'], data['type'],
-                data['address'], data['lat'], data['lon'], data[biz]
+                data['address'], data['lat'], data['lon'], data['biz']
                 data['notes'], data.get('image_path'), data['timestamp']
             ))
             conn.commit()
