@@ -75,8 +75,8 @@ def save_to_db(data):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data['name'], data['phone'], data['type'],
-                data['address'], data['lat'], data['lon'], data['biz'],
-                data['notes'], data.get('image_path'), data['timestamp']
+                data['address'], data['lat'], data['lon'],
+                data['notes'], data.get('image_path'), data['timestamp'], data['biz']
             ))
             conn.commit()
             return True
@@ -200,11 +200,17 @@ if not data.empty:
     
     # Configure marker colors
     type_colors = {
-        "Prospect": "orange",
-        "Existing": "green",
-        "VIP": "red",
-        "Repeat": "blue"
+        "General Retail": "blue",
+        "Electronics & Appliances": "purple",
+        "Fashion & Clothing": "pink",
+        "Restaurant/Café": "orange",
+        "Street Food Stall": "red",
+        "Beauty Salon": "violet",
+        "Repair Services": "brown",
+        "Tourism/Hospitality": "green",
+        "Agriculture/Farming": "darkgreen"
     }
+
     
     # Add markers
     for _, row in data.iterrows():
@@ -213,7 +219,7 @@ if not data.empty:
                 {get_image_html(row.get('image_path'))}
                 <h4 style="margin: 0;">{row['name']}</h4>
                 <p style="margin: 5px 0;">
-                    <b>Type:</b> {row['type']}<br>
+                    <b>Biz Type:</b> {row['biz']}<br>
                     <b>Phone:</b> {row['phone']}<br>
                     <b>Last visit:</b> {row['timestamp']}<br>
                     <i>{row['notes']}</i>
