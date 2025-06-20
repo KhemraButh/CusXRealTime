@@ -24,7 +24,7 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                biz_type TEXT NOT NULL,
+                type TEXT NOT NULL,
                 address TEXT,
                 lat REAL NOT NULL,
                 lon REAL NOT NULL,
@@ -34,13 +34,15 @@ def init_db():
             )
         """)
         conn.commit()
+init_db()  # This should already be in your code
 
-# Initialize database and handle schema migration
-init_db()
+# Add this migration code:
 with sqlite3.connect(DB_NAME) as conn:
     try:
+        # Check if image_path column exists
         conn.execute("SELECT image_path FROM locations LIMIT 1")
     except sqlite3.OperationalError:
+        # If not, add it
         conn.execute("ALTER TABLE locations ADD COLUMN image_path TEXT")
         conn.commit()
 
@@ -51,7 +53,7 @@ def save_image(uploaded_file):
         
     # Generate unique filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    ext = uploaded_file.name.split('.')[-1].lower()
+    ext = uploaded_file.name.split('.')[-1]
     filename = f"{timestamp}.{ext}"
     filepath = os.path.join(IMAGE_DIR, filename)
     
@@ -68,10 +70,10 @@ def save_to_db(data):
             c = conn.cursor()
             c.execute("""
                 INSERT INTO locations 
-                (name, phone, biz_type, address, lat, lon, notes, image_path, timestamp)
+                (name, phone, type, address, lat, lon, notes, image_path, timestamp)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                data['name'], data['phone'], data['biz_type'],
+                data['name'], data['phone'], data['type'],
                 data['address'], data['lat'], data['lon'],
                 data['notes'], data.get('image_path'), data['timestamp']
             ))
@@ -100,11 +102,9 @@ def get_image_html(image_path):
         img = Image.open(image_path)
         img.thumbnail((100, 100))
         buffered = io.BytesIO()
-        # Determine image format
-        img_format = "JPEG" if image_path.lower().endswith('.jpg') or image_path.lower().endswith('.jpeg') else "PNG"
-        img.save(buffered, format=img_format)
+        img.save(buffered, format="JPEG" if image_path.lower().endswith('.jpg') else "PNG")
         encoded = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        return f'<img src="data:image/{img_format.lower()};base64,{encoded}" style="width: 100px; height: auto; border-radius: 8px; margin-bottom: 5px;" />'
+        return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 100px; height: auto; border-radius: 8px; margin-bottom: 5px;" />'
     except Exception as e:
         st.warning(f"Couldn't load image: {str(e)}")
         return '<p><i>Image unavailable</i></p>'
@@ -149,17 +149,9 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
         with col1:
             name = st.text_input("Customer Name*")
             phone = st.text_input("Phone Number*")
-            biz_type = st.selectbox('Biz Type*', [
-                "General Retail",
-                "Electronics & Appliances",
-                "Fashion & Clothing", 
-                "Restaurant/Café",
-                "Street Food Stall", 
-                "Beauty Salon", 
-                "Repair Services", 
-                "Tourism/Hospitality", 
-                "Agriculture/Farming"
-            ])
+            cust_type = st.selectbox("Customer Type*", ["General Retail", "Electronics & Appliances", "Fashion & Clothing", "Restaurant/Café",
+            "Street Food Stall", "Beauty Salon", "Repair Services", "Tourism/Hospitality",
+            "Agriculture/Farming"])
             
         with col2:
             address = st.text_area("Address")
@@ -182,7 +174,7 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
                 if save_to_db({
                     'name': name,
                     'phone': phone,
-                    'biz_type': biz_type,
+                    'type': cust_type,
                     'address': address,
                     'lat': lat,
                     'lon': lon,
@@ -192,7 +184,6 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
                 }):
                     st.success("Customer saved successfully!")
                     st.balloons()
-                    st.rerun()  # Refresh to show new data
                 else:
                     st.error("Failed to save customer data")
 
@@ -225,9 +216,9 @@ if not data.empty:
         popup_html = f"""
             <div style="width: 150px;">
                 {get_image_html(row.get('image_path'))}
-                <h4 style="margin: 0; font-size: 14px;">{row['name']}</h4>
-                <p style="margin: 5px 0; font-size: 12px;">
-                    <b>Biz Type:</b> {row['biz_type']}<br>
+                <h4 style="margin: 0;">{row['name']}</h4>
+                <p style="margin: 5px 0;">
+                    <b>Type:</b> {row['type']}<br>
                     <b>Phone:</b> {row['phone']}<br>
                     <b>Last visit:</b> {row['timestamp']}<br>
                     <i>{row['notes']}</i>
@@ -238,8 +229,8 @@ if not data.empty:
         folium.Marker(
             [row["lat"], row["lon"]],
             popup=folium.Popup(popup_html, max_width=300),
-            tooltip=f"{row['name']} ({row['biz_type']})",
-            icon=folium.Icon(color=type_colors.get(row['biz_type'], "gray"))
+            tooltip=row['name'],
+            icon=folium.Icon(color=type_colors.get(row['type'], "gray"))
         ).add_to(m_all)
 
     # Add heatmap
