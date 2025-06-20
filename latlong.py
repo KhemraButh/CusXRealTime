@@ -24,7 +24,6 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                type TEXT NOT NULL,
                 biz TEXT NOT NULL,
                 address TEXT,
                 lat REAL NOT NULL,
@@ -71,10 +70,10 @@ def save_to_db(data):
             c = conn.cursor()
             c.execute("""
                 INSERT INTO locations 
-                (name, phone, type, address, lat, lon, notes, image_path, timestamp, biz)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (name, phone, address, lat, lon, notes, image_path, timestamp, biz)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                data['name'], data['phone'], data['type'],
+                data['name'], data['phone'],
                 data['address'], data['lat'], data['lon'],
                 data['notes'], data.get('image_path'), data['timestamp'], data['biz']
             ))
