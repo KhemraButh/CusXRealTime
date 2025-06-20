@@ -24,7 +24,7 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                biz TEXT NOT NULL,
+                biz_type TEXT NOT NULL,
                 address TEXT,
                 lat REAL NOT NULL,
                 lon REAL NOT NULL,
@@ -70,12 +70,12 @@ def save_to_db(data):
             c = conn.cursor()
             c.execute("""
                 INSERT INTO locations 
-                (name, phone, address, lat, lon, notes, image_path, timestamp, biz)
+                (name, phone, address, lat, lon, notes, image_path, timestamp, biz_type)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data['name'], data['phone'],
                 data['address'], data['lat'], data['lon'],
-                data['notes'], data.get('image_path'), data['timestamp'], data['biz']
+                data['notes'], data.get('image_path'), data['timestamp'], data['biz_type']
             ))
             conn.commit()
             return True
@@ -173,7 +173,7 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
                 if save_to_db({
                     'name': name,
                     'phone': phone,
-                    'biz': biz_type,
+                    'biz_type': biz_type,
                     'address': address,
                     'lat': lat,
                     'lon': lon,
