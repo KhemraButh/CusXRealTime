@@ -25,6 +25,7 @@ def init_db():
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
                 type TEXT NOT NULL,
+                biz TEXT NOT NULL,
                 address TEXT,
                 lat REAL NOT NULL,
                 lon REAL NOT NULL,
@@ -70,11 +71,11 @@ def save_to_db(data):
             c = conn.cursor()
             c.execute("""
                 INSERT INTO locations 
-                (name, phone, type, address, lat, lon, notes, image_path, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (name, phone, type, address, lat, lon, notes, image_path, timestamp, biz)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data['name'], data['phone'], data['type'],
-                data['address'], data['lat'], data['lon'],
+                data['address'], data['lat'], data['lon'], data[biz]
                 data['notes'], data.get('image_path'), data['timestamp']
             ))
             conn.commit()
@@ -150,6 +151,8 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
             name = st.text_input("Customer Name*")
             phone = st.text_input("Phone Number*")
             cust_type = st.selectbox("Customer Type*", ["Prospect", "Existing", "VIP", "Repeat"])
+            biz_type = st.selectbox('Biz Type*', ["General Retail","Electronics & Appliances","Fashion & Clothing", "Restaurant/Café",
+            "Street Food Stall", "Beauty Salon", "Repair Services", "Tourism/Hospitality", "Agriculture/Farming"])
             
         with col2:
             address = st.text_area("Address")
