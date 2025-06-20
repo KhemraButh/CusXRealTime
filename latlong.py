@@ -174,7 +174,7 @@ with st.expander("📝 Step 2: Customer Information", expanded=True):
                 if save_to_db({
                     'name': name,
                     'phone': phone,
-                    'type': cust_type,
+                    'biz': biz_type,
                     'address': address,
                     'lat': lat,
                     'lon': lon,
