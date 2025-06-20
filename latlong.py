@@ -218,7 +218,7 @@ if not data.empty:
                 {get_image_html(row.get('image_path'))}
                 <h4 style="margin: 0;">{row['name']}</h4>
                 <p style="margin: 5px 0;">
-                    <b>Biz Type:</b> {row['biz']}<br>
+                    <b>Biz Type:</b> {row['biz_type']}<br>
                     <b>Phone:</b> {row['phone']}<br>
                     <b>Last visit:</b> {row['timestamp']}<br>
                     <i>{row['notes']}</i>
@@ -230,7 +230,7 @@ if not data.empty:
             [row["lat"], row["lon"]],
             popup=folium.Popup(popup_html, max_width=300),
             tooltip=row['name'],
-            icon=folium.Icon(color=type_colors.get(row['type'], "gray"))
+            icon=folium.Icon(color=type_colors.get(row[biz_type'], "gray"))
         ).add_to(m_all)
 
     # Add heatmap
